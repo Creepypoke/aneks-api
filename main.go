@@ -20,6 +20,7 @@ import (
 
 var DB *gorm.DB
 var CFG *models.Config
+const COUNT_PAGE int = 20
 
 func main() {
 	InitConfig()
@@ -74,14 +75,41 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 func AnekIndex(w http.ResponseWriter, r *http.Request) {
 	var aneks []models.Anek
-	DB.Find(&aneks)
-
-	a, err := json.Marshal(aneks)
-	if err != nil {
-		fmt.Println(err.Error())
+	fmt.Println(r.URL.Query())
+	fmt.Println(r.URL.Query().Get("page"))
+	fmt.Println(r.URL.Query().Get("count"))
+	
+	
+	if len(r.URL.Query().Get("page")) > 0 {
+		var count int = COUNT_PAGE
+		if len(r.URL.Query().Get("count")) > 0 {
+			count, _ = strconv.Atoi(r.URL.Query().Get("count"))
+			
+			if count >= 100 {
+				count = COUNT_PAGE
+			}
+		}
+		page, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			fmt.Println(err.Error())
+			page = 0
+		}
+		DB.Limit(count).Offset(count * page).Find(&aneks)
 	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(a)
+	
+	if len(aneks) > 0 {
+		w.WriteHeader(http.StatusOK)
+		a, err := json.Marshal(aneks)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+
+		w.Write(a)
+	} else {
+		w.WriteHeader(http.StatusNoContent)
+	}
 }
 
 func AnekRandom(w http.ResponseWriter, r *http.Request) {
@@ -92,8 +120,8 @@ func AnekRandom(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	w.Write(a)
 }
 
@@ -107,10 +135,8 @@ func AnekShow(w http.ResponseWriter, r *http.Request) {
 	var anek models.Anek
 	DB.Where(&models.Anek{ID: anekId}).First(&anek)
 
-	w.WriteHeader(http.StatusNoContent)
-
+	w.Header().Set("Content-Type", "application/json")
 	if anek.ID != 0 {
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		a, err := json.Marshal(anek)
 		if err != nil {
@@ -118,5 +144,7 @@ func AnekShow(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.Write(a)
+	} else {
+		w.WriteHeader(http.StatusNoContent)
 	}
 }

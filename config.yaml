@@ -1,0 +1,7 @@
+app_port: 8081
+db_username: creepypoke_1
+db_password:
+db_name: c9
+db_address: 127.0.0.1
+db_ssh_mode: disable
+db_port: 5432

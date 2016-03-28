@@ -41,7 +41,7 @@ func main() {
 	DB.DB().SetMaxOpenConns(100)
 	// Disable table name's pluralization
 	DB.SingularTable(false)
-	//DB.CreateTable(&models.Anek{})
+	// DB.Set("gorm:table_options", "ENGINE=InnoDB").CreateTable(&models.Anek{})
 
 	router := InitRouter()
 
@@ -75,11 +75,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 func AnekIndex(w http.ResponseWriter, r *http.Request) {
 	var aneks []models.Anek
-	fmt.Println(r.URL.Query())
-	fmt.Println(r.URL.Query().Get("page"))
-	fmt.Println(r.URL.Query().Get("count"))
-	
-	
+
 	if len(r.URL.Query().Get("page")) > 0 {
 		var count int = COUNT_PAGE
 		if len(r.URL.Query().Get("count")) > 0 {

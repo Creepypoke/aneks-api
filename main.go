@@ -93,7 +93,7 @@ func AnekIndex(w http.ResponseWriter, r *http.Request) {
 		DB.Limit(count).Offset(count * page).Find(&aneks)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8, true")
 	
 	if len(aneks) > 0 {
 		w.WriteHeader(http.StatusOK)
@@ -116,7 +116,7 @@ func AnekRandom(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8, true")
 	w.WriteHeader(http.StatusOK)
 	w.Write(a)
 }
@@ -131,7 +131,7 @@ func AnekShow(w http.ResponseWriter, r *http.Request) {
 	var anek models.Anek
 	DB.Where(&models.Anek{ID: anekId}).First(&anek)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json; charset=utf-8, true")
 	if anek.ID != 0 {
 		w.WriteHeader(http.StatusOK)
 		a, err := json.Marshal(anek)
